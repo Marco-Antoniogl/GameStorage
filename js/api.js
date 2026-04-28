@@ -9,22 +9,11 @@
 const API_BASE = 'https://gameszeradosapi.onrender.com/api';
 // Anteriormente: 'https://localhost:7001/api'
 
-// ─── Token JWT (salvo após login) ─────────────────────────────────────────────
-// Guardamos só o token, nunca senha ou dados sensíveis
-let _token = sessionStorage.getItem('gv_token') ?? null;
-
-function setToken(token) {
-  _token = token;
-  if (token) sessionStorage.setItem('gv_token', token);
-  else        sessionStorage.removeItem('gv_token');
-}
-
-function getToken() { return _token; }
+// ─── Autenticação simples (email + senha) ────────────────────────────────────
 
 // ─── Fetch base com tratamento de erros ───────────────────────────────────────
 async function request(method, path, body = null) {
   const headers = { 'Content-Type': 'application/json' };
-  if (_token) headers['Authorization'] = `Bearer ${_token}`;
 
   const options = { method, headers };
   if (body) options.body = JSON.stringify(body);
@@ -34,13 +23,6 @@ async function request(method, path, body = null) {
     response = await fetch(`${API_BASE}${path}`, options);
   } catch {
     throw new Error('Sem conexão com o servidor. Verifique se a API está rodando.');
-  }
-
-  // Token expirado → desloga
-  if (response.status === 401) {
-    setToken(null);
-    window.dispatchEvent(new CustomEvent('auth:expired'));
-    throw new Error('Sessão expirada. Faça login novamente.');
   }
 
   // Erros do servidor
@@ -63,22 +45,17 @@ async function request(method, path, body = null) {
 export const AuthAPI = {
   async login(email, password) {
     const data = await request('POST', '/auth/login', { email, password });
-    setToken(data.token);
     return data.user;                 // { id, displayName, email }
   },
 
   async register(username, email, password) {
     const data = await request('POST', '/auth/register', { username, email, password });
-    setToken(data.token);
     return data.user;
   },
 
   logout() {
-    setToken(null);
+    // Sem token para remover
   },
-
-  getToken,
-  isAuthenticated: () => !!_token,
 };
 
 // ─── Games endpoints ──────────────────────────────────────────────────────────
