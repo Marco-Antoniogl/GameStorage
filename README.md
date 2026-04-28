@@ -4,24 +4,6 @@ SPA de gerenciamento de jogos sem frameworks, sem build tools, sem dependências
 
 ## 🚀 Como rodar
 
-**Opção 1 — VS Code com Live Server (recomendado)**
-1. Instale a extensão **Live Server** no VS Code
-2. Abra a pasta `gamevault-html` no VS Code
-3. Clique com botão direito em `index.html` → **Open with Live Server**
-4. Abre em `http://127.0.0.1:5500`
-
-**Opção 2 — Python (já vem no sistema)**
-```bash
-cd gamevault-html
-python3 -m http.server 3000
-# Acesse: http://localhost:3000
-```
-
-**Opção 3 — Node.js**
-```bash
-cd gamevault-html
-npx serve .
-```
 
 > ⚠️ **Não abra o `index.html` direto pelo navegador** (file://)  
 > Os ES Modules (`type="module"`) exigem um servidor HTTP.

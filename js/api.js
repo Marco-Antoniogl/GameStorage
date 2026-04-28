@@ -6,8 +6,8 @@
  */
 
 // ─── Configure aqui a URL da sua API ─────────────────────────────────────────
-const API_BASE = 'https://localhost:7001/api';
-// Em produção: 'https://minha-api.azurewebsites.net/api'
+const API_BASE = 'https://gameszeradosapi.onrender.com/api';
+// Anteriormente: 'https://localhost:7001/api'
 
 // ─── Token JWT (salvo após login) ─────────────────────────────────────────────
 // Guardamos só o token, nunca senha ou dados sensíveis
