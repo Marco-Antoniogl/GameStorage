@@ -1,7 +1,7 @@
 /**
  * router.js — Roteador SPA simples baseado em hash (#/dashboard, #/login…)
  */
-import { Auth } from './auth.js';
+import { Auth } from '.auth.js';
 
 const routes = {};
 let currentRoute = null;
