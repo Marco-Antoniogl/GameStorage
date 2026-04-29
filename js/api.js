@@ -45,7 +45,7 @@ async function request(method, path, body = null) {
 export const AuthAPI = {
   async login(email, password) {
     const data = await request('POST', '/auth/login', { email, password });
-    return data.user;                 // { id, displayName, email }
+    return data;;                 // { id, displayName, email }
   },
 
   async register(username, email, password) {

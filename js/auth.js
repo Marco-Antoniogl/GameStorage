@@ -1,87 +1,88 @@
-// api.js
-// Responsável por comunicação com a API ASP.NET
+// auth.js
+import { AuthAPI } from './api.js';
 
-const BASE_URL = 'https://gameszeradosapi.onrender.com'; // sua API
+const USE_MOCK = false;
 
-function getToken() {
-  return localStorage.getItem('token');
-}
+const MOCK_USER = {
+  id: 'dev-001',
+  displayName: 'Dev Tester',
+  email: 'dev@gamevault.local',
+};
 
-function setToken(token) {
-  localStorage.setItem('token', token);
-}
+export const Auth = {
+  currentUser: null,
 
-function removeToken() {
-  localStorage.removeItem('token');
-}
-
-async function request(endpoint, options = {}) {
-  const token = getToken();
-
-  const headers = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {}),
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
-
-  // Se token expirou
-  if (response.status === 401) {
-    removeToken();
-    window.dispatchEvent(new Event('auth:expired'));
-    throw new Error('Sessão expirada');
-  }
-
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(text || 'Erro na requisição');
-  }
-
-  return response.json();
-}
-
-export const AuthAPI = {
-  async login(email, password) {
-    const data = await request('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-
-    // Espera que a API retorne { token, user }
-    if (!data.token) {
-      throw new Error('Token não retornado pela API');
+  init() {
+    try {
+      const saved = sessionStorage.getItem('gv_user');
+      if (saved) this.currentUser = JSON.parse(saved);
+    } catch {
+      this.currentUser = null;
     }
 
-    setToken(data.token);
-
-    return data.user;
-  },
-
-  async register(username, email, password) {
-    const data = await request('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ username, email, password }),
-    });
-
-    if (data.token) {
-      setToken(data.token);
+    if (USE_MOCK && !this.currentUser) {
+      this.currentUser = MOCK_USER;
+      sessionStorage.setItem('gv_user', JSON.stringify(MOCK_USER));
     }
 
-    return data.user;
-  },
-
-  logout() {
-    removeToken();
+    window.addEventListener('auth:expired', () => {
+      this.currentUser = null;
+      sessionStorage.removeItem('gv_user');
+    });
   },
 
   isAuthenticated() {
-    return !!getToken();
+    // 🔥 Agora só depende do usuário em sessão
+    return !!this.currentUser;
+  },
+
+  async login(email, password) {
+    if (USE_MOCK) {
+      if (!email || password.length < 6) {
+        throw new Error('Credenciais inválidas');
+      }
+
+      this.currentUser = {
+        id: 'dev-001',
+        displayName: email.split('@')[0],
+        email,
+      };
+
+      sessionStorage.setItem('gv_user', JSON.stringify(this.currentUser));
+      return this.currentUser;
+    }
+
+    const user = await AuthAPI.login(email, password);
+
+    this.currentUser = user;
+    sessionStorage.setItem('gv_user', JSON.stringify(user));
+
+    return user;
+  },
+
+  async register(username, email, password) {
+    if (USE_MOCK) {
+      this.currentUser = {
+        id: crypto.randomUUID(),
+        displayName: username,
+        email,
+      };
+
+      sessionStorage.setItem('gv_user', JSON.stringify(this.currentUser));
+      return this.currentUser;
+    }
+
+    const user = await AuthAPI.register(username, email, password);
+
+    this.currentUser = user;
+    sessionStorage.setItem('gv_user', JSON.stringify(user));
+
+    return user;
+  },
+
+  logout() {
+    this.currentUser = null;
+    sessionStorage.removeItem('gv_user');
+    AuthAPI.logout();
   },
 };
