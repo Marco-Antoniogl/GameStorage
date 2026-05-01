@@ -60,18 +60,26 @@ export function renderLogin() {
   });
 
   // Form submit
-    document.getElementById('login-form').addEventListener('submit', async e => {  // 👈 async aqui
-      e.preventDefault();
-      const alertEl  = document.getElementById('login-alert');
-      const email    = document.getElementById('login-email').value.trim();
-      const password = document.getElementById('login-password').value;
-      alertEl.innerHTML = '';
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const alertEl  = document.getElementById('login-alert');
+    const email    = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const btnLogin = document.getElementById('btn-login');
+    alertEl.innerHTML = '';
 
-      try {
-        await Auth.login(email, password);  // 👈 await aqui
-        Router.navigate('/dashboard', { replace: true });
-      } catch (err) {
-        alertEl.innerHTML = `<div class="alert alert-error" role="alert">${err.message}</div>`;
-      }
-    });
+    // 👇 Desativa botão e mostra loading
+    btnLogin.disabled = true;
+    btnLogin.textContent = 'Entrando...';
+
+    try {
+      await Auth.login(email, password);
+      Router.navigate('/dashboard', { replace: true });
+    } catch (err) {
+      alertEl.innerHTML = `<div class="alert alert-error" role="alert">${err.message}</div>`;
+      // 👇 Restaura botão em caso de erro
+      btnLogin.disabled = false;
+      btnLogin.textContent = 'Entrar';
+    }
+  });
 }
