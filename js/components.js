@@ -18,7 +18,7 @@ export function renderNavbar(user) {
     <nav class="navbar">
       <div class="navbar-brand">
         <span style="font-size:1.4rem">🎮</span>
-        <span class="navbar-brand-name">GAME<span>VAULT</span></span>
+        <span class="navbar-brand-name">GAME<span>STORAGE</span></span>
       </div>
       <div class="navbar-user">
         <div class="navbar-avatar">${initials}</div>

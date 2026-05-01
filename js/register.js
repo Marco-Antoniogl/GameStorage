@@ -11,7 +11,7 @@ export function renderRegister() {
     <div class="auth-layout">
       <div class="auth-brand">
         <div class="brand-icon">🎮</div>
-        <h1 class="brand-name">GAME<span>VAULT</span></h1>
+        <h1 class="brand-name">GAME<span>STORAGE</span></h1>
         <p class="brand-tagline">Sua biblioteca. Seu progresso.</p>
       </div>
       <div class="auth-card">
