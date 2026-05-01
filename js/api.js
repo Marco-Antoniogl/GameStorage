@@ -1,11 +1,28 @@
 const API_BASE = 'https://gameszeradosapi.onrender.com/api';
 
 // ─── Token em memória ─────────────────────────────────────────────────────────
+//let _token = null;
+
+//export function setToken(token) { _token = token; }
+//export function getToken()      { return _token; }
+//export function clearToken()    { _token = null; }
+
 let _token = null;
 
-export function setToken(token) { _token = token; }
-export function getToken()      { return _token; }
-export function clearToken()    { _token = null; }
+export function setToken(token) {
+  _token = token;
+  localStorage.setItem('token', token);
+}
+
+export function getToken() {
+  if (!_token) _token = localStorage.getItem('token');
+  return _token;
+}
+
+export function clearToken() {
+  _token = null;
+  localStorage.removeItem('token');
+}
 
 // ─── Fetch base com tratamento de erros ──────────────────────────────────────
 async function request(method, path, body = null) {
