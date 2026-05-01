@@ -293,9 +293,12 @@ a { color: inherit; text-decoration: none; }
 .rating-max   { font-size: .72rem; color: var(--dim); }
 .rating-bar   { flex: 1; height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
 .rating-fill  { height: 100%; border-radius: 2px; transition: width .5s ease; }
-.rating-high .rating-value, .rating-high .rating-fill { color: var(--green); background: var(--green); }
-.rating-mid  .rating-value, .rating-mid  .rating-fill { color: var(--amber); background: var(--amber); }
-.rating-low  .rating-value, .rating-low  .rating-fill { color: var(--red);   background: var(--red);   } 
+.rating-high .rating-value { color: var(--green); }
+.rating-high .rating-fill  { background: var(--green); }
+.rating-mid  .rating-value { color: var(--amber); }
+.rating-mid  .rating-fill  { background: var(--amber); }
+.rating-low  .rating-value { color: var(--red); }
+.rating-low  .rating-fill  { background: var(--red); }
 
 .game-card-actions { display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border); }
 
