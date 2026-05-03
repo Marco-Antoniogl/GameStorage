@@ -308,7 +308,7 @@ function openModal(gameId = null) {
   } catch (err) {
     Toast.error(err.message ?? 'Erro ao salvar jogo.');
   }
-}
+
 
 // ── Deletar jogo ──────────────────────────────────────────────────────────────
 async function deleteGame(id) {
