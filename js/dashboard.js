@@ -202,6 +202,16 @@ function openModal(gameId = null) {
     displayEl.textContent = parseFloat(rangeEl.value).toFixed(1);
   });
 
+  // ✅ Agora está dentro do openModal, após o modal ser inserido no DOM
+  document.getElementById('g-horasDeJogo')?.addEventListener('input', e => {
+    const val    = e.target.value;
+    const partes = val.split('.');
+    if (partes[1] !== undefined && parseInt(partes[1]) >= 60) {
+      e.target.value = partes[0] + '.' + partes[1].slice(0, -1);
+      Toast.error('Minutos não podem ser maiores que 59');
+    }
+  });
+
   const close = () => wrapper.remove();
   document.getElementById('modal-close-btn')?.addEventListener('click', close);
   document.getElementById('modal-cancel-btn')?.addEventListener('click', close);
@@ -216,19 +226,6 @@ function openModal(gameId = null) {
 
   document.getElementById('modal-save-btn')?.addEventListener('click', () => saveGame(game, close));
 }
-
-document.getElementById('g-horasDeJogo')?.addEventListener('input', e => {
-  const val = e.target.value;
-  const partes = val.split('.');
-  if (partes[1] !== undefined && parseInt(partes[1]) >= 60) {
-    e.target.setCustomValidity('Minutos não podem ser maiores que 59');
-    e.target.reportValidity();
-    // remove o último dígito digitado
-    e.target.value = partes[0] + '.' + partes[1].slice(0, -1);
-  } else {
-    e.target.setCustomValidity('');
-  }
-});
 
 // ── Salvar jogo ───────────────────────────────────────────────────────────────
 async function saveGame(existingGame, close) {
