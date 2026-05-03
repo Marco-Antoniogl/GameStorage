@@ -232,7 +232,7 @@ function openModal(gameId = null) {
       }
 
       const minutos = parseInt(digits.slice(-2));
-      if (minutos >= 60) { Toast.error('Minutos não podem ser maiores que 59'); return; }
+      if (minutos >= 60) return; // ← só bloqueia o dígito, sem mensagem
 
       const horas = digits.slice(0, -2).replace(/^0+/, '') || '0';
       horasEl.value = `${horas}.${digits.slice(-2).padStart(2, '0')}`;
