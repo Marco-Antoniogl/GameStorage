@@ -217,8 +217,21 @@ function openModal(gameId = null) {
   document.getElementById('modal-save-btn')?.addEventListener('click', () => saveGame(game, close));
 }
 
+document.getElementById('g-horasDeJogo')?.addEventListener('input', e => {
+  const val = e.target.value;
+  const partes = val.split('.');
+  if (partes[1] !== undefined && parseInt(partes[1]) >= 60) {
+    e.target.setCustomValidity('Minutos não podem ser maiores que 59');
+    e.target.reportValidity();
+    // remove o último dígito digitado
+    e.target.value = partes[0] + '.' + partes[1].slice(0, -1);
+  } else {
+    e.target.setCustomValidity('');
+  }
+});
+
 // ── Salvar jogo ───────────────────────────────────────────────────────────────
-/*async function saveGame(existingGame, close) {
+async function saveGame(existingGame, close) {
   const form = document.getElementById('game-form');
   const data = {
     nomeGame:       document.getElementById('g-nomeGame').value.trim(),
@@ -259,74 +272,6 @@ function openModal(gameId = null) {
       await GamesAPI.create(data);
       Toast.success('Jogo adicionado à biblioteca!');
     }
-    close();
-    loadGames();
-  } catch (err) {
-    Toast.error(err.message ?? 'Erro ao salvar jogo.');
-  }
-}*/
-
-function normalizeHoras(valor) {
-  const horas = Math.floor(valor);
-  const minutos = Math.round((valor % 1) * 100);
-  return horas + minutos / 60;
-}
-
-async function saveGame(existingGame, close) {
-  const form = document.getElementById('game-form');
-
-  const horasInput = parseFloat(document.getElementById('g-horasDeJogo').value) || 0;
-
-  const minutosDigitados = Math.round((horasInput % 1) * 100);
-  if (minutosDigitados >= 60) {
-    Toast.error('Minutos não podem ser maiores que 59');
-    return;
-  }
-
-  const data = {
-    nomeGame: document.getElementById('g-nomeGame').value.trim(),
-    genero: document.getElementById('g-genero').value,
-    plataforma: document.getElementById('g-plataforma').value,
-    status: document.getElementById('g-status').value,
-    horasDeJogo: normalizeHoras(horasInput),
-    notaGame: parseFloat(document.getElementById('g-notaGame').value) || 0,
-    dataFechamento: document.getElementById('g-dataFechamento').value || '',
-    coverUrl: document.getElementById('g-coverUrl').value.trim(),
-  };
-
-  // ✅ TUDO AQUI DENTRO
-  form.querySelectorAll('.field').forEach(f => {
-    f.classList.remove('has-error');
-    f.querySelector('.field-error')?.remove();
-  });
-
-  const errors = validateGame(data);
-  if (Object.keys(errors).length > 0) {
-    for (const [key, msg] of Object.entries(errors)) {
-      const input = document.getElementById(`g-${key}`);
-      const field = input?.closest('.field');
-      if (!field) continue;
-
-      field.classList.add('has-error');
-
-      const err = document.createElement('p');
-      err.className = 'field-error';
-      err.textContent = msg;
-
-      field.appendChild(err);
-    }
-    return; // ✅ agora está dentro da função
-  }
-
-  try {
-    if (existingGame) {
-      await GamesAPI.update(existingGame.id, data);
-      Toast.success('Jogo atualizado com sucesso!');
-    } else {
-      await GamesAPI.create(data);
-      Toast.success('Jogo adicionado à biblioteca!');
-    }
-
     close();
     loadGames();
   } catch (err) {
