@@ -9,7 +9,7 @@ export function formatHours(h) {
     return `${Math.round(n * 60)}min`;
   /*return `${n}h`; */
   const rounded = Math.round(n * 100) / 100;
-  return `${parseFloat(rounded.toFixed(2))}h`;
+  return `${rounded.toFixed(2)}h`;
 }
 
 export function formatDate(s) {
