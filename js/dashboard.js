@@ -218,7 +218,7 @@ function openModal(gameId = null) {
 }
 
 // ── Salvar jogo ───────────────────────────────────────────────────────────────
-async function saveGame(existingGame, close) {
+/*async function saveGame(existingGame, close) {
   const form = document.getElementById('game-form');
   const data = {
     nomeGame:       document.getElementById('g-nomeGame').value.trim(),
@@ -229,7 +229,51 @@ async function saveGame(existingGame, close) {
     notaGame:       parseFloat(document.getElementById('g-notaGame').value) || 0,
     dataFechamento: document.getElementById('g-dataFechamento').value || '',
     coverUrl:       document.getElementById('g-coverUrl').value.trim(),
-  };
+  }; */
+
+    function normalizeHoras(input) {
+    const n = Number(input) || 0;
+
+    const horas = Math.floor(n);
+    const minutos = Math.round((n - horas) * 100);
+
+    return horas + (minutos / 60);
+  }
+
+  async function saveGame(existingGame, close) {
+    const horasInput = parseFloat(document.getElementById('g-horasDeJogo').value) || 0;
+
+    // 🔒 Validação: impede minutos inválidos (ex: .70, .99, etc)
+    const minutosDigitados = Math.round((horasInput % 1) * 100);
+    if (minutosDigitados >= 60) {
+      alert('Minutos não podem ser maiores que 59');
+      return;
+    }
+
+    const data = {
+      nomeGame:       document.getElementById('g-nomeGame').value.trim(),
+      genero:         document.getElementById('g-genero').value,
+      plataforma:     document.getElementById('g-plataforma').value,
+      status:         document.getElementById('g-status').value,
+      horasDeJogo:    normalizeHoras(horasInput),
+      notaGame:       parseFloat(document.getElementById('g-notaGame').value) || 0,
+      dataFechamento: document.getElementById('g-dataFechamento').value || '',
+      coverUrl:       document.getElementById('g-coverUrl').value.trim(),
+    };
+
+    try {
+      if (existingGame) {
+        await updateGame(existingGame.id, data);
+      } else {
+        await createGame(data);
+      }
+
+      close();
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao salvar jogo');
+    }
+  }
 
   form.querySelectorAll('.field').forEach(f => {
     f.classList.remove('has-error');
