@@ -266,6 +266,12 @@ function openModal(gameId = null) {
   }
 }*/
 
+function normalizeHoras(valor) {
+  const horas = Math.floor(valor);
+  const minutos = Math.round((valor % 1) * 100);
+  return horas + minutos / 60;
+}
+
 async function saveGame(existingGame, close) {
   const form = document.getElementById('game-form');
 
