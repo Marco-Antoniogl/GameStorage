@@ -58,7 +58,7 @@ export function renderGameCard(game) {
         </div>
       </div>
       <div class="game-card-actions">
-        <button class="btn btn-ghost btn-sm btn-edit-game" data-id="${game.id}" style="flex:1">✏️ Editar</button>
+        <button class="btn btn-ghost btn-sm btn-edit-game" data-id="${game.id}" style="flex:1">✏️</button>
         <button class="btn btn-danger btn-sm btn-delete-game" data-id="${game.id}">🗑</button>
       </div>
     </article>`;
