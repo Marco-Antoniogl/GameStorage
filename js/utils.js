@@ -5,8 +5,10 @@
 // ── Formatadores ──────────────────────────────────────────────────────────────
 export function formatHours(h) {
   const n = Number(h) || 0;
-  if (n < 1) return `${Math.round(n * 60)}min`;
-  return `${n}h`;
+  if (n < 1) 
+    return `${Math.round(n * 60)}min`;
+  const rounded = Math.round(n * 100) / 100;
+  return `${rounded.toFixed(2)}h`;
 }
 
 export function formatDate(s) {

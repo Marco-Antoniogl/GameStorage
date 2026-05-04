@@ -202,6 +202,39 @@ function openModal(gameId = null) {
     displayEl.textContent = parseFloat(rangeEl.value).toFixed(1);
   });
 
+  // ── Máscara horas ─────────────────────────────────────────────────────────
+  const horasEl = document.getElementById('g-horasDeJogo');
+  if (horasEl) {
+    if (game?.horasDeJogo != null) {
+      const raw   = String(game.horasDeJogo).replace('.', '').padStart(4, '0');
+      const horas = raw.slice(0, -2).replace(/^0+/, '') || '0';
+      const min   = raw.slice(-2);
+      horasEl.value = `${horas}.${min}`;
+    } else {
+      horasEl.value = '0.00';
+    }
+
+    horasEl.addEventListener('keydown', e => {
+      const allowed = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight'];
+      if (allowed.includes(e.key)) return;
+      if (!/^\d$/.test(e.key)) { e.preventDefault(); return; }
+
+      e.preventDefault();
+
+      let digits = horasEl.value.replace('.', '');
+
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        digits = '0' + digits.slice(0, -1);
+      } else {
+        digits = digits + e.key;
+        if (digits.length > 4) return;
+      }
+
+      const horas = digits.slice(0, -2).replace(/^0+/, '') || '0';
+      horasEl.value = `${horas}.${digits.slice(-2).padStart(2, '0')}`;
+    });
+  }
+
   const close = () => wrapper.remove();
   document.getElementById('modal-close-btn')?.addEventListener('click', close);
   document.getElementById('modal-cancel-btn')?.addEventListener('click', close);
@@ -220,6 +253,13 @@ function openModal(gameId = null) {
 // ── Salvar jogo ───────────────────────────────────────────────────────────────
 async function saveGame(existingGame, close) {
   const form = document.getElementById('game-form');
+
+  const horasVal = document.getElementById('g-horasDeJogo').value;
+  const minutos  = parseInt(horasVal.split('.')[1] ?? '0');
+  if (minutos >= 60) {
+    Toast.error('Minutos não podem ser maiores que 59');
+    return;
+  }
   const data = {
     nomeGame:       document.getElementById('g-nomeGame').value.trim(),
     genero:         document.getElementById('g-genero').value,

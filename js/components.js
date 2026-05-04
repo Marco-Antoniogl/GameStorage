@@ -58,7 +58,7 @@ export function renderGameCard(game) {
         </div>
       </div>
       <div class="game-card-actions">
-        <button class="btn btn-ghost btn-sm btn-edit-game" data-id="${game.id}" style="flex:1">✏️ Editar</button>
+        <button class="btn btn-ghost btn-sm btn-edit-game" data-id="${game.id}" style="flex:1">✏️</button>
         <button class="btn btn-danger btn-sm btn-delete-game" data-id="${game.id}">🗑</button>
       </div>
     </article>`;
@@ -70,7 +70,22 @@ export function renderSkeletons(n = 8) {
 
 export function renderStatsBar(games) {
   const total  = games.length;
-  const horas  = games.reduce((s, g) => s + (Number(g.horasDeJogo) || 0), 0);
+  /*const horas  = games.reduce((s, g) => s + (Number(g.horasDeJogo) || 0), 0); */
+  const toMinutos = (val) => {
+    const n = parseFloat(String(val || '0').replace(',', '.')) || 0;
+    const h = Math.floor(n);
+    const m = Math.round((n % 1) * 100);
+    return h * 60 + m;
+  };
+
+  const fromMinutos = (total) => {
+    const h = Math.floor(total / 60);
+    const m = total % 60;
+    return `${h}.${String(m).padStart(2, '0')}`;
+  };
+
+  const totalMinutos = games.reduce((s, g) => s + toMinutos(g.horasDeJogo), 0);
+  const horas = fromMinutos(totalMinutos);
   const zerados = games.filter(g => g.status === 'zerado').length;
   const jogando = games.filter(g => g.status === 'jogando').length;
   const avg    = total ? (games.reduce((s,g) => s + (Number(g.notaGame)||0), 0) / total).toFixed(1) : '—';
