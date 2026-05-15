@@ -97,7 +97,7 @@ function applyFilters() {
 function renderGrid() {
   const { filtered, page } = state;
   const total      = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+  const totalPages = Math.max(2, Math.ceil(total / PER_PAGE));
   const slice      = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   document.getElementById('game-count').textContent =
