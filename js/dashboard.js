@@ -10,18 +10,20 @@ import {
   renderStatsBar, renderFiltersBar, renderGameModal, renderPagination,
 } from './components.js';
 
-const PER_PAGE = 12;
+const PER_PAGE = 15;
 
 let state = {
-  allGames:  [],
-  filtered:  [],
-  page:      1,
-  sortField: 'createdAt',
-  sortOrder: 'desc',
-  search:    '',
-  genre:     '',
-  platform:  '',
-  status:    '',
+  allGames:   [],
+  filtered:   [],
+  page:       1,
+  totalPages: 1,
+  total:      0,
+  sortField:  'createdAt',
+  sortOrder:  'desc',
+  search:     '',
+  genre:      '',
+  platform:   '',
+  status:     '',
 };
 
 // ── Render principal ──────────────────────────────────────────────────────────
@@ -58,47 +60,45 @@ export function renderDashboard() {
 }
 
 // ── Carregar jogos da API ─────────────────────────────────────────────────────
-async function loadGames() {
-  try {
-    const result = await GamesAPI.list();
-    state.allGames = result?.data ?? result ?? [];
-    applyFilters();
-  } catch (err) {
+
+async function loadGames(){
+  try{
+    const result = await GamesAPI.list({
+      search:    state.search,
+      genero:    state.genre,
+      plataforma: state.platform,
+      status:    state.status,
+      sortField: state.sortField,
+      sortOrder: state.sortOrder,
+      page:      state.page,
+      limit:     15,
+    });
+
+    if (state.page === 1){
+      state.allGames = result.data;
+    }
+    else{
+      state.allGames = [...state.allGames, ...result.data];
+    }
+    state.total = result.total;
+    state.totalPages = result.totalPages;
+
+    renderGrid();
+  } catch (err){
     Toast.error(err.message ?? 'Erro ao carregar jogos.');
   }
 }
 
 // ── Filtros ───────────────────────────────────────────────────────────────────
 function applyFilters() {
-  let games = [...state.allGames];
-
-  if (state.search) {
-    const term = state.search.toLowerCase();
-    games = games.filter(g => g.nomeGame.toLowerCase().includes(term));
-  }
-  if (state.genre)    games = games.filter(g => g.genero === state.genre);
-  if (state.platform) games = games.filter(g => g.plataforma === state.platform);
-  if (state.status)   games = games.filter(g => g.status === state.status);
-
-  games.sort((a, b) => {
-    const va = a[state.sortField] ?? '';
-    const vb = b[state.sortField] ?? '';
-    const cmp = typeof va === 'number'
-      ? va - vb
-      : String(va).localeCompare(String(vb), 'pt-BR');
-    return state.sortOrder === 'asc' ? cmp : -cmp;
-  });
-
-  state.filtered = games;
-  state.page     = 1;
-  renderGrid();
+  state.page = 1;
+  state.allGames = []; // limpa antes de recarregar
+  loadGames();
 }
 
 function renderGrid() {
-  const { filtered, page } = state;
-  const total      = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-  const slice      = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const total   = state.total;
+  const hasMore = state.page < state.totalPages;
 
   document.getElementById('game-count').textContent =
     `${total} jogo${total !== 1 ? 's' : ''} na biblioteca`;
@@ -117,17 +117,19 @@ function renderGrid() {
       </div>`;
     document.getElementById('btn-add-empty')?.addEventListener('click', openModal);
   } else {
-    grid.innerHTML = slice.map(renderGameCard).join('');
+    grid.innerHTML = state.allGames.map(renderGameCard).join('');
     bindCardActions();
   }
 
-  document.getElementById('pagination-area').innerHTML = renderPagination(page, totalPages);
-  document.querySelectorAll('.pagination button[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.page = parseInt(btn.dataset.page);
-      renderGrid();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+  document.getElementById('pagination-area').innerHTML = hasMore
+    ? `<div class="pagination">
+         <button id="btn-load-more">Mostrar mais ↓</button>
+       </div>`
+    : '';
+
+  document.getElementById('btn-load-more')?.addEventListener('click', () => {
+    state.page += 1;
+    loadGames();
   });
 }
 
@@ -252,71 +254,19 @@ function openModal(gameId = null) {
 
 // ── Salvar jogo ───────────────────────────────────────────────────────────────
 async function saveGame(existingGame, close) {
-  const form = document.getElementById('game-form');
-
-  const horasVal = document.getElementById('g-horasDeJogo').value;
-  const minutos  = parseInt(horasVal.split('.')[1] ?? '0');
-  if (minutos >= 60) {
-    Toast.error('Minutos não podem ser maiores que 59');
-    return;
-  }
-  const data = {
-    nomeGame:       document.getElementById('g-nomeGame').value.trim(),
-    genero:         document.getElementById('g-genero').value,
-    plataforma:     document.getElementById('g-plataforma').value,
-    status:         document.getElementById('g-status').value,
-    horasDeJogo:    parseFloat(document.getElementById('g-horasDeJogo').value) || 0,
-    notaGame:       parseFloat(document.getElementById('g-notaGame').value) || 0,
-    dataFechamento: document.getElementById('g-dataFechamento').value || '',
-    coverUrl:       document.getElementById('g-coverUrl').value.trim(),
-  };
-
-  form.querySelectorAll('.field').forEach(f => {
-    f.classList.remove('has-error');
-    f.querySelector('.field-error')?.remove();
-  });
-
-  const errors = validateGame(data);
-  if (Object.keys(errors).length > 0) {
-    for (const [key, msg] of Object.entries(errors)) {
-      const input = document.getElementById(`g-${key}`);
-      const field = input?.closest('.field');
-      if (!field) continue;
-      field.classList.add('has-error');
-      const err = document.createElement('p');
-      err.className = 'field-error';
-      err.textContent = msg;
-      field.appendChild(err);
-    }
-    return;
-  }
-
-  try {
-    if (existingGame) {
-      await GamesAPI.update(existingGame.id, data);
-      Toast.success('Jogo atualizado com sucesso!');
-    } else {
-      await GamesAPI.create(data);
-      Toast.success('Jogo adicionado à biblioteca!');
-    }
-    close();
-    loadGames();
-  } catch (err) {
-    Toast.error(err.message ?? 'Erro ao salvar jogo.');
-  }
+  // ...
+  close();
+  state.page = 1;      // 👈 adicione isso
+  state.allGames = []; // 👈 e isso
+  loadGames();
 }
 
 // ── Deletar jogo ──────────────────────────────────────────────────────────────
 async function deleteGame(id) {
-  const game = state.allGames.find(g => g.id === id);
-  if (!game) return;
-  if (!confirm(`Remover "${game.nomeGame}" da biblioteca?`)) return;
-
-  try {
-    await GamesAPI.delete(id);
-    Toast.info('Jogo removido.');
-    loadGames();
-  } catch (err) {
-    Toast.error(err.message ?? 'Erro ao remover jogo.');
-  }
+  // ...
+  await GamesAPI.delete(id);
+  Toast.info('Jogo removido.');
+  state.page = 1;      // 👈 adicione isso
+  state.allGames = []; // 👈 e isso
+  loadGames();
 }
