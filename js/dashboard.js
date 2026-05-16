@@ -10,7 +10,7 @@ import {
   renderStatsBar, renderFiltersBar, renderGameModal, renderPagination,
 } from './components.js';
 
-const PER_PAGE = 12;
+const PER_PAGE = 15;
 
 let state = {
   allGames:  [],
@@ -97,8 +97,8 @@ function applyFilters() {
 function renderGrid() {
   const { filtered, page } = state;
   const total      = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-  const slice      = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+  const totalPages = page * PER_PAGE;
+  const slice      = filtered.slice(0, visible);
 
   document.getElementById('game-count').textContent =
     `${total} jogo${total !== 1 ? 's' : ''} na biblioteca`;
@@ -120,15 +120,17 @@ function renderGrid() {
     grid.innerHTML = slice.map(renderGameCard).join('');
     bindCardActions();
   }
-
-  document.getElementById('pagination-area').innerHTML = renderPagination(page, totalPages);
-  document.querySelectorAll('.pagination button[data-page]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.page = parseInt(btn.dataset.page);
-      renderGrid();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  });
+  
+  const hasMore = visible < total;
+  document.getElementById('pagination-area').innerHTML = hasMore
+    ?`<div class="pagination">
+        <button id="btn-load-more">Mostrar mais ↓</button>
+      </div>`
+    : '';
+  document.getElementById('btn-load-more')?.addEventListener('click', () =>{
+    state.page += 1;
+    renderGrid();
+    })
 }
 
 // ── Bind card actions ─────────────────────────────────────────────────────────
