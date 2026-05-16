@@ -97,8 +97,8 @@ function applyFilters() {
 function renderGrid() {
   const { filtered, page } = state;
   const total      = filtered.length;
+  const visible = page * PER_PAGE;
   const slice      = filtered.slice(0, visible);
-  const totalPages = page * PER_PAGE;
 
   document.getElementById('game-count').textContent =
     `${total} jogo${total !== 1 ? 's' : ''} na biblioteca`;
