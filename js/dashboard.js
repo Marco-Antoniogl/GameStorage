@@ -100,6 +100,8 @@ function renderGrid() {
   const visible = page * PER_PAGE;
   const slice      = filtered.slice(0, visible);
 
+  console.log({ total, visible, hasMore: visible < total, sliceLength: slice.length });
+
   document.getElementById('game-count').textContent =
     `${total} jogo${total !== 1 ? 's' : ''} na biblioteca`;
 
