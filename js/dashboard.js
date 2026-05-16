@@ -13,15 +13,17 @@ import {
 const PER_PAGE = 15;
 
 let state = {
-  allGames:  [],
-  filtered:  [],
-  page:      1,
-  sortField: 'createdAt',
-  sortOrder: 'desc',
-  search:    '',
-  genre:     '',
-  platform:  '',
-  status:    '',
+  allGames:   [],
+  filtered:   [],
+  page:       1,
+  totalPages: 1,
+  total:      0,
+  sortField:  'createdAt',
+  sortOrder:  'desc',
+  search:     '',
+  genre:      '',
+  platform:   '',
+  status:     '',
 };
 
 // ── Render principal ──────────────────────────────────────────────────────────
@@ -58,49 +60,45 @@ export function renderDashboard() {
 }
 
 // ── Carregar jogos da API ─────────────────────────────────────────────────────
-async function loadGames() {
-  try {
-    const result = await GamesAPI.list();
-    state.allGames = result?.data ?? result ?? [];
-    applyFilters();
-  } catch (err) {
+
+async function loadGames(){
+  try{
+    const result = await GamesAPI.list({
+      search:    state.search,
+      genero:    state.genre,
+      plataforma: state.platform,
+      status:    state.status,
+      sortField: state.sortField,
+      sortOrder: state.sortOrder,
+      page:      state.page,
+      limit:     12,
+    });
+
+    if (stage.page === 1){
+      state.allGames = result.data;
+    }
+    else{
+      state.allGames = [...state.allGames, ...result.data];
+    }
+    state.total = result.total;
+    state.totalPages = result.totalPages;
+
+    renderGrid();
+  } catch (err){
     Toast.error(err.message ?? 'Erro ao carregar jogos.');
   }
 }
 
 // ── Filtros ───────────────────────────────────────────────────────────────────
 function applyFilters() {
-  let games = [...state.allGames];
-
-  if (state.search) {
-    const term = state.search.toLowerCase();
-    games = games.filter(g => g.nomeGame.toLowerCase().includes(term));
-  }
-  if (state.genre)    games = games.filter(g => g.genero === state.genre);
-  if (state.platform) games = games.filter(g => g.plataforma === state.platform);
-  if (state.status)   games = games.filter(g => g.status === state.status);
-
-  games.sort((a, b) => {
-    const va = a[state.sortField] ?? '';
-    const vb = b[state.sortField] ?? '';
-    const cmp = typeof va === 'number'
-      ? va - vb
-      : String(va).localeCompare(String(vb), 'pt-BR');
-    return state.sortOrder === 'asc' ? cmp : -cmp;
-  });
-
-  state.filtered = games;
-  state.page     = 1;
-  renderGrid();
+  state.page = 1;
+  state.allGames = []; // limpa antes de recarregar
+  loadGames();
 }
 
 function renderGrid() {
-  const { filtered, page } = state;
-  const total      = filtered.length;
-  const visible = page * PER_PAGE;
-  const slice      = filtered.slice(0, visible);
-
-  console.log({ total, visible, hasMore: visible < total, sliceLength: slice.length });
+  const total   = state.total;
+  const hasMore = state.page < state.totalPages;
 
   document.getElementById('game-count').textContent =
     `${total} jogo${total !== 1 ? 's' : ''} na biblioteca`;
@@ -119,20 +117,20 @@ function renderGrid() {
       </div>`;
     document.getElementById('btn-add-empty')?.addEventListener('click', openModal);
   } else {
-    grid.innerHTML = slice.map(renderGameCard).join('');
+    grid.innerHTML = state.allGames.map(renderGameCard).join('');
     bindCardActions();
   }
-  
-  const hasMore = visible < total;
+
   document.getElementById('pagination-area').innerHTML = hasMore
-    ?`<div class="pagination">
-        <button id="btn-load-more">Mostrar mais ↓</button>
-      </div>`
+    ? `<div class="pagination">
+         <button id="btn-load-more">Mostrar mais ↓</button>
+       </div>`
     : '';
-  document.getElementById('btn-load-more')?.addEventListener('click', () =>{
+
+  document.getElementById('btn-load-more')?.addEventListener('click', () => {
     state.page += 1;
-    renderGrid();
-    })
+    loadGames();
+  });
 }
 
 // ── Bind card actions ─────────────────────────────────────────────────────────
