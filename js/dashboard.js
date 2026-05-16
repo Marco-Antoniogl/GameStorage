@@ -74,7 +74,7 @@ async function loadGames(){
       limit:     12,
     });
 
-    if (stage.page === 1){
+    if (state.page === 1){
       state.allGames = result.data;
     }
     else{
@@ -254,71 +254,19 @@ function openModal(gameId = null) {
 
 // ── Salvar jogo ───────────────────────────────────────────────────────────────
 async function saveGame(existingGame, close) {
-  const form = document.getElementById('game-form');
-
-  const horasVal = document.getElementById('g-horasDeJogo').value;
-  const minutos  = parseInt(horasVal.split('.')[1] ?? '0');
-  if (minutos >= 60) {
-    Toast.error('Minutos não podem ser maiores que 59');
-    return;
-  }
-  const data = {
-    nomeGame:       document.getElementById('g-nomeGame').value.trim(),
-    genero:         document.getElementById('g-genero').value,
-    plataforma:     document.getElementById('g-plataforma').value,
-    status:         document.getElementById('g-status').value,
-    horasDeJogo:    parseFloat(document.getElementById('g-horasDeJogo').value) || 0,
-    notaGame:       parseFloat(document.getElementById('g-notaGame').value) || 0,
-    dataFechamento: document.getElementById('g-dataFechamento').value || '',
-    coverUrl:       document.getElementById('g-coverUrl').value.trim(),
-  };
-
-  form.querySelectorAll('.field').forEach(f => {
-    f.classList.remove('has-error');
-    f.querySelector('.field-error')?.remove();
-  });
-
-  const errors = validateGame(data);
-  if (Object.keys(errors).length > 0) {
-    for (const [key, msg] of Object.entries(errors)) {
-      const input = document.getElementById(`g-${key}`);
-      const field = input?.closest('.field');
-      if (!field) continue;
-      field.classList.add('has-error');
-      const err = document.createElement('p');
-      err.className = 'field-error';
-      err.textContent = msg;
-      field.appendChild(err);
-    }
-    return;
-  }
-
-  try {
-    if (existingGame) {
-      await GamesAPI.update(existingGame.id, data);
-      Toast.success('Jogo atualizado com sucesso!');
-    } else {
-      await GamesAPI.create(data);
-      Toast.success('Jogo adicionado à biblioteca!');
-    }
-    close();
-    loadGames();
-  } catch (err) {
-    Toast.error(err.message ?? 'Erro ao salvar jogo.');
-  }
+  // ...
+  close();
+  state.page = 1;      // 👈 adicione isso
+  state.allGames = []; // 👈 e isso
+  loadGames();
 }
 
 // ── Deletar jogo ──────────────────────────────────────────────────────────────
 async function deleteGame(id) {
-  const game = state.allGames.find(g => g.id === id);
-  if (!game) return;
-  if (!confirm(`Remover "${game.nomeGame}" da biblioteca?`)) return;
-
-  try {
-    await GamesAPI.delete(id);
-    Toast.info('Jogo removido.');
-    loadGames();
-  } catch (err) {
-    Toast.error(err.message ?? 'Erro ao remover jogo.');
-  }
+  // ...
+  await GamesAPI.delete(id);
+  Toast.info('Jogo removido.');
+  state.page = 1;      // 👈 adicione isso
+  state.allGames = []; // 👈 e isso
+  loadGames();
 }
