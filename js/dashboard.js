@@ -71,7 +71,7 @@ async function loadGames(){
       sortField: state.sortField,
       sortOrder: state.sortOrder,
       page:      state.page,
-      limit:     12,
+      limit:     15,
     });
 
     if (state.page === 1){
