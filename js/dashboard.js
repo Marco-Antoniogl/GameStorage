@@ -204,7 +204,7 @@ function openModal(gameId = null) {
     displayEl.textContent = parseFloat(rangeEl.value).toFixed(1);
   });
 
-  // ── Máscara horas ─────────────────────────────────────────────────────────
+  // ── Máscara horas  ─────────────────────────────────────────────────────────
   const horasEl = document.getElementById('g-horasDeJogo');
   if (horasEl) {
     if (game?.horasDeJogo != null) {
