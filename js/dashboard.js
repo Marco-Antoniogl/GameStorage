@@ -204,11 +204,11 @@ function openModal(gameId = null) {
     displayEl.textContent = parseFloat(rangeEl.value).toFixed(1);
   });
 
-  // ── Máscara horas ─────────────────────────────────────────────────────────
+  // ── Máscara horas  ─────────────────────────────────────────────────────────
   const horasEl = document.getElementById('g-horasDeJogo');
   if (horasEl) {
     if (game?.horasDeJogo != null) {
-      const raw   = String(game.horasDeJogo).replace('.', '').padStart(4, '0');
+      const raw   = String(game.horasDeJogo).replace('.', '').padStart(6, '0');
       const horas = raw.slice(0, -2).replace(/^0+/, '') || '0';
       const min   = raw.slice(-2);
       horasEl.value = `${horas}.${min}`;
@@ -229,7 +229,7 @@ function openModal(gameId = null) {
         digits = '0' + digits.slice(0, -1);
       } else {
         digits = digits + e.key;
-        if (digits.length > 4) return;
+        if (digits.length > 6) return;
       }
 
       const horas = digits.slice(0, -2).replace(/^0+/, '') || '0';
