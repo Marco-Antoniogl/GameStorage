@@ -57,6 +57,7 @@ export function renderDashboard() {
   loadGames();
   bindFilters();
   bindAddButton();
+  BugReport.init();
 }
 
 // ── Carregar jogos da API ─────────────────────────────────────────────────────
@@ -370,5 +371,3 @@ const BugReport = (() => {
   return { init };
 
 })();
-
-BugReport.init();
