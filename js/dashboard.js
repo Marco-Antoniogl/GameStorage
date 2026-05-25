@@ -335,7 +335,7 @@ const BugReport = (() => {
         data:      getDate(),
         descricao,
         navegador: getBrowser(),
-        resolucao
+        resolucao,
       })
     });
 
