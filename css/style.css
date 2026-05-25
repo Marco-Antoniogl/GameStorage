@@ -449,11 +449,11 @@ a { color: inherit; text-decoration: none; }
   position: relative;
 }
 
-.bug-report__pulse {
+css.bug-report__pulse {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  animation: pulse 2s infinite;
+  animation: bug-pulse 2s infinite; /* ← era pulse, corrigido para bug-pulse */
 }
 
 @keyframes bug-pulse {
