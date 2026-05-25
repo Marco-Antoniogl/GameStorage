@@ -10,3 +10,4 @@ Todas as atualizações importantes deste projeto serão documentadas aqui.
 
 ### Atualizações futuras
 - Inserir uma API com uma list de games criados, torna padrão uma seleção de game para padronizar.
+- Icone flutuando para realizar um report de bug, que vai bater em um txt na API.

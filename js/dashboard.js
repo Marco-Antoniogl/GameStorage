@@ -57,6 +57,7 @@ export function renderDashboard() {
   loadGames();
   bindFilters();
   bindAddButton();
+  BugReport.init();
 }
 
 // ── Carregar jogos da API ─────────────────────────────────────────────────────
@@ -270,3 +271,101 @@ async function deleteGame(id) {
   state.allGames = []; // 👈 e isso
   loadGames();
 }
+
+// -- Botão de report de bug ──────────────────────────────────────────────────────────────
+
+const BugReport = (() => {
+
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgP6EquoZQnvek_2eRmEbLItXbnTeEGLi0kxhZaVV_alelwik-8rm7mHmi0HR8NAWW/exec';
+
+  /* ── Helpers ── */
+  const getDate = () => new Date().toLocaleDateString('pt-BR');
+
+  const getBrowser = () => {
+    const ua = navigator.userAgent;
+    if (ua.includes('Chrome') && !ua.includes('Edg'))   return 'Google Chrome';
+    if (ua.includes('Firefox'))                          return 'Mozilla Firefox';
+    if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+    if (ua.includes('Edg'))                              return 'Microsoft Edge';
+    if (ua.includes('OPR') || ua.includes('Opera'))     return 'Opera';
+    return 'Desconhecido';
+  };
+
+  const getResolution = () => `${screen.width}x${screen.height}`;
+
+  /* ── Modal ── */
+  const fillFields = () => {
+    document.getElementById('brm-data').value      = getDate();
+    document.getElementById('brm-navegador').value = getBrowser();
+  };
+
+  const open = () => {
+    fillFields();
+    document.getElementById('brm-descricao').value = '';
+    document.getElementById('brm-erro').classList.add('hidden');
+    document.getElementById('brm-btn-send').disabled    = false;
+    document.getElementById('brm-btn-send').textContent = 'Enviar Report';
+    document.getElementById('bug-report-modal').classList.remove('hidden');
+  };
+
+  const close = () => {
+    document.getElementById('bug-report-modal').classList.add('hidden');
+  };
+
+  /* ── Envio ── */
+  const send = async () => {
+    const descricao = document.getElementById('brm-descricao').value.trim();
+    const erro      = document.getElementById('brm-erro');
+    const btnSend   = document.getElementById('brm-btn-send');
+
+    if (!descricao) {
+      erro.classList.remove('hidden');
+      document.getElementById('brm-descricao').focus();
+      return;
+    }
+
+    erro.classList.add('hidden');
+    btnSend.disabled    = true;
+    btnSend.textContent = 'Enviando...';
+
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode:   'no-cors',
+      body:   JSON.stringify({
+        data:      getDate(),
+        descricao,
+        navegador: getBrowser()
+      })
+    });
+
+    btnSend.textContent = 'Enviado!';
+    setTimeout(close, 800);
+  };
+
+  /* ── Eventos ── */
+  const bindEvents = () => {
+    document.querySelector('.bug-report__button').addEventListener('click', open);
+
+    document.querySelector('.brm-close').addEventListener('click', close);
+    document.querySelector('.brm-btn-cancel').addEventListener('click', close);
+
+    document.getElementById('bug-report-modal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) close();
+    });
+
+    document.getElementById('brm-btn-send').addEventListener('click', send);
+  };
+
+
+  /* ── Init ── */
+    const init = () => {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindEvents);
+      } else {
+        bindEvents();
+      }
+    };
+
+  return { init };
+
+})();
