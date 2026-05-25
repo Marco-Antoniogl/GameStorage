@@ -334,8 +334,7 @@ const BugReport = (() => {
       body:   JSON.stringify({
         data:      getDate(),
         descricao,
-        navegador: getBrowser(),
-        resolucao,
+        navegador: getBrowser()
       })
     });
 
