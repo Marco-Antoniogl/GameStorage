@@ -7,6 +7,7 @@ Todas as atualizações importantes deste projeto serão documentadas aqui.
 ### Correções
 - Paginação de card(atualmente quando passa de 12 itens, ele ignora os primeiros cadastros)
 - o Valor da Hora Total, está bugando quando adiciona item na fila que é == 0.
+- Atualmente todos os links e codigos estão sendo enviados no codigo, preciso corrigir e alterar para uma .env
 
 ### Atualizações futuras
 - Inserir uma API com uma list de games criados, torna padrão uma seleção de game para padronizar.
