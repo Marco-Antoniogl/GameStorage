@@ -357,8 +357,15 @@ const BugReport = (() => {
     document.getElementById('brm-btn-send').addEventListener('click', send);
   };
 
+
   /* ── Init ── */
-  const init = () => bindEvents();
+    const init = () => {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindEvents);
+      } else {
+        bindEvents();
+      }
+    };
 
   return { init };
 
