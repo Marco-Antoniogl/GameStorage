@@ -297,7 +297,6 @@ const BugReport = (() => {
   const fillFields = () => {
     document.getElementById('brm-data').value      = getDate();
     document.getElementById('brm-navegador').value = getBrowser();
-    document.getElementById('brm-resolucao').value = getResolution();
   };
 
   const open = () => {
@@ -336,7 +335,7 @@ const BugReport = (() => {
         data:      getDate(),
         descricao,
         navegador: getBrowser(),
-        resolucao: getResolution()
+        resolucao
       })
     });
 
