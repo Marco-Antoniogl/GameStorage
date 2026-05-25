@@ -275,7 +275,7 @@ async function deleteGame(id) {
 
 const BugReport = (() => {
 
-  const APPS_SCRIPT_URL = 'SUA_URL_DO_APPS_SCRIPT_AQUI';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgP6EquoZQnvek_2eRmEbLItXbnTeEGLi0kxhZaVV_alelwik-8rm7mHmi0HR8NAWW/exec';
 
   /* ── Helpers ── */
   const getDate = () => new Date().toLocaleDateString('pt-BR');
