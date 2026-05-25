@@ -448,18 +448,12 @@ a { color: inherit; text-decoration: none; }
   transition: background 0.2s ease, transform 0.15s ease;
   position: relative;
 }
-.bug-report__button::before {
-  content: "";
+
+.bug-report__pulse {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.6); }
-  70%  { box-shadow: 0 0 0 14px rgba(229, 57, 53, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
 }
  
     .bug-report__button:hover  { background: #c62828; }
