@@ -386,3 +386,18 @@ a { color: inherit; text-decoration: none; }
   .filters-row { flex-direction: column; align-items: stretch; }
   .filters-row select { width: 100%; }
 }
+
+/* ── Botão report ── */
+.btn-report{
+    background:#ff4d4f;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.btn-report:hover{
+    background:#d9363e;
+}
