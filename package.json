@@ -1,0 +1,17 @@
+{
+  "name": "gamestorage",
+  "version": "1.0.0",
+  "description": "GameStorage — sua biblioteca de jogos pessoal",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build step required for vanilla JS project'",
+    "lint": "echo 'No linter configured'"
+  },
+  "keywords": ["games", "storage", "library"],
+  "author": "Marco-Antoniogl",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^1.4.1"
+  }
+}
