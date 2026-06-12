@@ -5,10 +5,8 @@ Todas as atualizações importantes deste projeto serão documentadas aqui.
 - Adicionar setor de ranking
 
 ### Correções
-- Paginação de card(atualmente quando passa de 12 itens, ele ignora os primeiros cadastros)
-- o Valor da Hora Total, está bugando quando adiciona item na fila que é == 0.
 - Atualmente todos os links e codigos estão sendo enviados no codigo, preciso corrigir e alterar para uma .env
 
 ### Atualizações futuras
 - Inserir uma API com uma list de games criados, torna padrão uma seleção de game para padronizar.
-- Icone flutuando para realizar um report de bug, que vai bater em um txt na API.
+- Adiciona o item wishlist e remover os itens que acabam bagunçando o design do site.
